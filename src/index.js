@@ -2,10 +2,10 @@ import PictureCard from './example/picture_card.hbs';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
-import ApiSearchingPictures from './js/fetchPictures';
+import ApiSearchingPictures from './js/getPictures';
 import LoadMoreBtn from './js/loadMore';
 import './sass/main.css';
-import { page, perPage } from './js/fetchPictures';
+import { page, perPage } from './js/getPictures';
 
 const refs = {
   searchForm: document.querySelector('.search-form'),
@@ -20,7 +20,7 @@ const loadMoreBtn = new LoadMoreBtn({
 const apiSearchingPictures = new ApiSearchingPictures();
 
 refs.searchForm.addEventListener('submit', onSearch);
-loadMoreBtn.refs.button.addEventListener('click', fetchPictures);
+loadMoreBtn.refs.button.addEventListener('click', getPictures);
 
 function onSearch(e) {
   e.preventDefault();
@@ -29,10 +29,10 @@ function onSearch(e) {
 
   apiSearchingPictures.resetPage();
   clearGallery();
-  fetchPictures();
+  getPictures();
 }
 
-function fetchPictures() {
+/* function getPictures() {
   if (apiSearchingPictures.query === '') {
     alarmErrorNoQuerry();
     return;
@@ -41,30 +41,55 @@ function fetchPictures() {
   loadMoreBtn.show();
   loadMoreBtn.disable();
 
-  apiSearchingPictures.fetchPictures().then(pictures => {
-    if (pictures.data.totalHits === 0) {
-      alarmErrorNoFunding();
-    } else if (page === 2) {
-       Notify.success(`Hooray! We found ${pictures.data.totalHits} totalHits images.`, {
-         timeout: 11000,
-       });
-    } else if (page > Math.ceil(pictures.data.totalHits / perPage)) {
-      alarmInfoFinishSearch();
-    }
-
-    console.log(pictures.data);
-    appendPicturesMarkup(pictures);
+  apiSearchingPictures.getPictures().then(response => {
+    alarm(response);
+    console.log(response);
+    appendPicturesMarkup(response);
     loadMoreBtn.enable();
-  });
+  })
+  
+} */
+
+async function getPictures() {
+  if (apiSearchingPictures.query === '') {
+    alarmErrorNoQuerry();
+    return;
+  }
+
+  loadMoreBtn.show();
+  loadMoreBtn.disable();
+
+  try {
+    const response = await apiSearchingPictures.getPictures();
+    alarm(response);
+    console.log(response);
+    appendPicturesMarkup(response);
+    loadMoreBtn.enable();
+  } catch (error) {
+    console.log(error.message);
+  }
 }
 
-function appendPicturesMarkup(pictures) {
-  refs.gallery.insertAdjacentHTML('beforeend', PictureCard(pictures.data.hits));
+function appendPicturesMarkup(response) {
+  refs.gallery.insertAdjacentHTML('beforeend', PictureCard(response.hits));
   const lightbox = new SimpleLightbox('.gallery a');
+  
 }
 
 function clearGallery() {
   refs.gallery.innerHTML = '';
+}
+
+function alarm(response) {
+  if (response.totalHits === 0) {
+    alarmErrorNoFunding();
+  } else if (page === 2) {
+    Notify.success(`Hooray! We found ${response.totalHits} totalHits images.`, {
+      timeout: 11000,
+    });
+  } else if (page > Math.ceil(response.totalHits / perPage)) {
+    alarmInfoFinishSearch();
+  }
 }
 
 function alarmInfoFinishSearch() {

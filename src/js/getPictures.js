@@ -13,13 +13,21 @@ export default class ApiSearchingPictures {
     this.safesearch = 'true';
   }
 
-  fetchPictures() {
+  /* getPictures() {
     const url = `${this.baseUrl}/?key=${this.key}&q=${this.searchQuery}&image_type=${this.imageType}&orientation=${this.orientation}&safesearch=${this.safesearch}&page=${page}&per_page=${perPage}`;
 
     return axios.get(url).then(pictures => {
       this.incrementPage();
       return pictures;
     });
+  } */
+
+  async getPictures() {
+    const url = `${this.baseUrl}/?key=${this.key}&q=${this.searchQuery}&image_type=${this.imageType}&orientation=${this.orientation}&safesearch=${this.safesearch}&page=${page}&per_page=${perPage}`;
+
+    const response = await axios.get(url);
+    this.incrementPage();
+    return response.data;
   }
 
   incrementPage() {
