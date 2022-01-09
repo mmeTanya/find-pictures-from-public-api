@@ -1,4 +1,4 @@
-import PictureCard from './example/picture_card.hbs';
+import PictureCard from './templates/picture_card.hbs';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
@@ -32,30 +32,11 @@ function onSearch(e) {
   getPictures();
 }
 
-/* function getPictures() {
-  if (apiSearchingPictures.query === '') {
-    alarmErrorNoQuerry();
-    return;
-  }
-
-  loadMoreBtn.show();
-  loadMoreBtn.disable();
-
-  apiSearchingPictures.getPictures().then(response => {
-    alarm(response);
-    console.log(response);
-    appendPicturesMarkup(response);
-    loadMoreBtn.enable();
-  })
-  
-} */
-
 async function getPictures() {
   if (apiSearchingPictures.query === '') {
     alarmErrorNoQuerry();
     return;
   }
-
   loadMoreBtn.show();
   loadMoreBtn.disable();
 
@@ -66,14 +47,13 @@ async function getPictures() {
     appendPicturesMarkup(response);
     loadMoreBtn.enable();
   } catch (error) {
-    console.log(error.message);
+    alarmErrorNoFunding();
   }
 }
 
 function appendPicturesMarkup(response) {
   refs.gallery.insertAdjacentHTML('beforeend', PictureCard(response.hits));
   const lightbox = new SimpleLightbox('.gallery a');
-  
 }
 
 function clearGallery() {
@@ -84,17 +64,16 @@ function alarm(response) {
   if (response.totalHits === 0) {
     alarmErrorNoFunding();
   } else if (page === 2) {
-    Notify.success(`Hooray! We found ${response.totalHits} totalHits images.`, {
-      timeout: 11000,
-    });
-  } else if (page > Math.ceil(response.totalHits / perPage)) {
+    alarmInfoTotalHits(response);
+  }
+  if (page > Math.ceil(response.totalHits / perPage || response.totalHits === perPage)) {
     alarmInfoFinishSearch();
   }
 }
 
 function alarmInfoFinishSearch() {
   loadMoreBtn.hide(),
-    Notify.success("We're sorry, but you've reached the end of search results.", {
+    Notify.info("We're sorry, but you've reached the end of search results.", {
       timeout: 11000,
     });
 }
@@ -105,9 +84,13 @@ function alarmErrorNoFunding() {
 }
 
 function alarmErrorNoQuerry() {
-  if (apiSearchingPictures.query === '') {
-    loadMoreBtn.hide();
-    Notify.failure('Please fill the form');
-    return;
-  }
+  loadMoreBtn.hide();
+  Notify.failure('Please fill the form');
+  return;
+}
+
+function alarmInfoTotalHits(response) {
+  Notify.success(`Hooray! We found ${response.totalHits} totalHits images.`, {
+    timeout: 11000,
+  });
 }
