@@ -65,8 +65,8 @@ p {
   align-items: center;
 }
 .gallery__link {
-  width: 450px;
-  height: 400px;
+  width: 350px;
+  height: 270px;
   margin-bottom: 30px;
   background-color: beige;
   border: 3px solid #005873;
@@ -86,7 +86,7 @@ p {
   display: flex;
   justify-content: space-around;
   align-items: center;
-  margin-top: 15px;
+  margin-top: 3px;
 }
 .info__item {
   display: flex;
