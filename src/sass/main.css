@@ -83,7 +83,7 @@ p {
 
 .info {
   display: flex;
-  justify-content: start;
+  justify-content: space-between;
   align-items: center;
   margin-top: 3px;
 }
