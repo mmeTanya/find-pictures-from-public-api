@@ -62,11 +62,14 @@ function clearGallery() {
 
 function alarm(response) {
   if (response.totalHits === 0) {
-    alarmErrorNoFunding();
+    return alarmErrorNoFunding();
   } else if (page === 2) {
     alarmInfoTotalHits(response);
   }
-  if (page > Math.ceil(response.totalHits / perPage || response.totalHits === perPage)) {
+  if (
+    page > Math.ceil(response.totalHits / perPage) ||
+    (response.totalHits <= perPage && response.totalHits > 0)
+  ) {
     alarmInfoFinishSearch();
   }
 }
